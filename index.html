@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Clay County IL - Directory</title>
+
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide-react"></script>
+
+    <style>
+        /* Container default: 90% width based on your project standards */
+        #root {
+            width: 90%;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body class="bg-[#0f172a]">
+
+    <div id="root"></div>
+
+    <script type="text/babel" data-presets="react">
+        const { useState, useMemo, useEffect } = React;
+        
+        // This helper allows the Lucide icons in your JSX to work in the browser
+        window.lucide = lucide;
+
+        // Fetching your actual file from GitHub
+        async function loadApp() {
+            try {
+                // We use the 'raw' version of the link to get just the code
+                const response = await fetch('https://raw.githubusercontent.com/KFruti88/Jobs-and-Land-for-Sale/main/ClayCountyDirectory.jsx');
+                const code = await response.text();
+                
+                // Transpile and execute the code
+                const transpiledCode = Babel.transform(code, {
+                    presets: ['react'],
+                    plugins: ['transform-modules-umd']
+                }).code;
+                
+                eval(transpiledCode);
+            } catch (err) {
+                console.error("Failed to load ClayCountyDirectory.jsx:", err);
+                document.getElementById('root').innerHTML = `<p style="color:white; text-align:center; margin-top:50px;">Error loading directory. Please try again later.</p>`;
+            }
+        }
+
+        loadApp();
+    </script>
+
+</body>
+</html>
