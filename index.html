@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Clay County Land Portal | v1.16</title>
+    <title>Clay County Land Portal | v1.18</title>
 
     <script src="https://kfruti88.github.io/Universal-Menu-Bar/universal-menu.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -20,6 +20,7 @@
             --thunder-glow: rgba(0, 242, 255, 0.4);
             --card-bg: rgba(15, 17, 35, 0.95);
             --highlight-yellow: #ffff00;
+            --maroon-item: #800000; /* Maroon Item Font */
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -98,7 +99,6 @@
             text-shadow: 0 0 10px var(--thunder-glow);
         }
 
-        /* FULL NAME FIX: Allowed text to wrap and show completely */
         .prop-name {
             font-family: 'Orbitron', sans-serif;
             font-size: 1.2rem;
@@ -129,15 +129,14 @@
 
         .btn-maps:hover { color: var(--electric-blue); }
 
-        /* FULL DESCRIPTION FIX: Respects line breaks and expands */
         .prop-desc {
             color: #d1d1ff;
             font-size: 1rem;
             line-height: 1.6;
             margin-bottom: 25px;
-            max-height: 300px; /* Increased room for descriptions */
+            max-height: 250px;
             overflow-y: auto;
-            white-space: pre-wrap; /* Keeps your emojis and line breaks exactly as they are in Sheets */
+            white-space: pre-wrap;
             padding-right: 5px;
         }
 
@@ -158,20 +157,34 @@
 
         .btn-source:hover { background: var(--electric-blue); color: var(--deep-space); }
 
-        /* Yellow Highlighted Date/ID */
+        /* MULTI-ELEMENT FOOTER */
         .prop-footer {
             padding: 12px 30px;
             background: rgba(0,0,0,0.6);
-            font-size: 0.85rem;
-            color: var(--highlight-yellow);
-            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between; /* Pushes ID left, Item right */
+            align-items: center;
             border-top: 1px solid rgba(0, 242, 255, 0.1);
+        }
+
+        .footer-date {
+            font-size: 0.85rem;
+            color: var(--highlight-yellow); /* Yellow Date */
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .footer-item {
+            font-size: 0.85rem;
+            color: var(--maroon-item); /* Maroon Item Number */
+            text-transform: uppercase;
             font-weight: bold;
         }
 
         @media (max-width: 768px) {
             .wrapper { width: 95%; }
             .grid { grid-template-columns: 1fr; }
+            .prop-footer { flex-direction: column; gap: 5px; align-items: flex-start; }
         }
     </style>
 </head>
@@ -192,8 +205,8 @@
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT22Warsbi_J0ErAWQsF1WAVXQ9GQZwqWaZG1IDIU9M0ZjR9VniJmFtaPO2dNejCFS5jJO4ca2Jo0Ue/pub?gid=919890739&single=true&output=csv';
 
     /**
-     * ADVANCED CSV PARSER (v1.16)
-     * Correctly handles spaces, commas, and newlines inside quoted cells.
+     * ADVANCED CSV PARSER (v1.18)
+     * Handles formatted currency ($10,600,000) and commas inside cells.
      */
     function parseCSV(text) {
         const result = [];
@@ -206,7 +219,7 @@
             const nextChar = text[i + 1];
 
             if (char === '"' && inQuotes && nextChar === '"') {
-                col += '"'; i++; // Handle escaped double quotes
+                col += '"'; i++; // Escaped quote
             } else if (char === '"') {
                 inQuotes = !inQuotes;
             } else if (char === ',' && !inQuotes) {
@@ -217,7 +230,7 @@
                     result.push(row);
                     row = []; col = "";
                 }
-                if (char === '\r' && nextChar === '\n') i++; // Skip extra line break character
+                if (char === '\r' && nextChar === '\n') i++; 
             } else {
                 col += char;
             }
@@ -234,21 +247,21 @@
             const response = await fetch(CSV_URL);
             const rawData = await response.text();
             
-            // Deep-parse the entire spreadsheet at once
+            // Parse all 8 columns correctly
             const dataRows = parseCSV(rawData).slice(1); 
             const container = document.getElementById('land-grid');
             container.innerHTML = '';
 
             dataRows.forEach(cols => {
-                // Strictly mapping your A-G layout
                 if (cols && cols.length >= 7) {
                     const name = cols[0] || 'N/A';
                     const mapsLink = cols[1] || '#';
-                    const price = cols[2] || 'N/A';
+                    const price = cols[2] || 'N/A'; // Correctly preserves $ and ,
                     const dateId = cols[3] || 'N/A';
                     const sourceUrl = cols[4] || '#';
                     const imgUrl = cols[5] || 'https://via.placeholder.com/400x250/05050a/00f2ff?text=No+Satellite+Image';
                     const desc = cols[6] || 'No description found in sector.';
+                    const itemNum = cols[7] || ''; // NEW Column H: Item Number
 
                     container.innerHTML += `
                         <div class="land-card">
@@ -265,7 +278,8 @@
                                 <a href="${sourceUrl}" class="btn-source" target="_blank">INVESTIGATE SOURCE</a>
                             </div>
                             <div class="prop-footer">
-                                SECTOR ID / DATE: ${dateId}
+                                <span class="footer-date">SECTOR ID / DATE: ${dateId}</span>
+                                <span class="footer-item">ITEM #${itemNum}</span>
                             </div>
                         </div>
                     `;
