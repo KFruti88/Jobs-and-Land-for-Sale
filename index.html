@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Clay County Land Portal | v1.10</title>
+    <title>Clay County Land Portal | v1.11</title>
 
     <script src="https://kfruti88.github.io/Universal-Menu-Bar/universal-menu.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -31,6 +31,7 @@
             width: 100%;
         }
 
+        /* Cinematic Space Background */
         .hero-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle at center, #161b40 0%, #05050a 100%);
@@ -43,16 +44,17 @@
             opacity: 0.3; z-index: -1;
         }
 
-        /* 90% Width Container */
+        /* Standard 90% Width Container */
         .wrapper { width: 90%; max-width: 1400px; margin: 60px auto; }
 
+        /* Listing Grid */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
             gap: 30px;
         }
 
-        /* Land Card - Mjolnir Aesthetic */
+        /* Glossy Tech Card Design */
         .land-card {
             background: var(--card-bg);
             border: 1px solid rgba(0, 242, 255, 0.2);
@@ -62,12 +64,22 @@
             flex-direction: column;
             transition: 0.4s;
             backdrop-filter: blur(10px);
+            position: relative;
         }
 
         .land-card:hover {
             border-color: var(--electric-blue);
             box-shadow: 0 0 25px var(--thunder-glow);
             transform: translateY(-5px);
+        }
+
+        /* Top Gloss Shine */
+        .land-card::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 50%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, transparent 100%);
+            pointer-events: none;
         }
 
         .prop-img {
@@ -98,12 +110,7 @@
             color: #fff;
         }
 
-        .prop-loc { 
-            margin: 15px 0 20px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .prop-loc { margin: 15px 0 20px 0; }
 
         .btn-maps {
             color: #aaa;
@@ -112,7 +119,7 @@
             font-weight: bold;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
             transition: 0.3s;
         }
 
@@ -152,7 +159,7 @@
             border-top: 1px solid rgba(0, 242, 255, 0.1);
         }
 
-        /* Mobile Stacking Rule */
+        /* Responsive Mobile Layout */
         @media (max-width: 768px) {
             .wrapper { width: 95%; }
             .grid { grid-template-columns: 1fr; }
@@ -166,36 +173,38 @@
 
 <div class="wrapper">
     <div class="grid" id="land-grid">
-        <p style="text-align:center; color:var(--electric-blue); font-family:'Orbitron'; padding: 100px;">Establishing Neural Link to Clay County Registry...</p>
+        <p style="text-align:center; color:var(--electric-blue); font-family:'Orbitron'; padding: 100px;">
+            Establishing Link to Land Registry...
+        </p>
     </div>
 </div>
 
 <script>
-    // CSV URL targeting the 'Land for sale' GID directly
-    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT22Warsbi_J0ErAWQsF1WAVXQ9GQZwqWaZG1IDIU9M0ZjR9VniJmFtaPO2dNejCFS5jJO4ca2Jo0Ue/pub?gid=289568772&output=csv';
+    // Updated CSV URL for Land only
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT22Warsbi_J0ErAWQsF1WAVXQ9GQZwqWaZG1IDIU9M0ZjR9VniJmFtaPO2dNejCFS5jJO4ca2Jo0Ue/pub?gid=919890739&single=true&output=csv';
 
-    async function fetchLandRegistry() {
+    async function syncLandData() {
         try {
             const response = await fetch(CSV_URL);
             const data = await response.text();
             
-            // Skip header row and filter out empty lines
+            // Parse rows and remove header
             const rows = data.split('\n').slice(1).filter(row => row.trim() !== '');
             const container = document.getElementById('land-grid');
             container.innerHTML = '';
 
             rows.forEach(row => {
-                // Regex handles commas inside quoted descriptions correctly (Column G)
+                // Mapping: A=Name, B=Location/Maps, C=Price, D=Date/ID, E=Source, F=Image, G=Description
                 const cols = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
 
                 if (cols && cols.length >= 7) {
                     const name = cols[0]?.replace(/"/g, '') || 'N/A';
-                    const mapsUrl = cols[1]?.replace(/"/g, '') || '#';
+                    const mapsLink = cols[1]?.replace(/"/g, '') || '#';
                     const price = cols[2]?.replace(/"/g, '') || 'N/A';
                     const dateId = cols[3]?.replace(/"/g, '') || 'N/A';
                     const sourceUrl = cols[4]?.replace(/"/g, '') || '#';
-                    const imgUrl = cols[5]?.replace(/"/g, '') || 'https://via.placeholder.com/400x250/05050a/00f2ff?text=No+Satellite+Data';
-                    const desc = cols[6]?.replace(/"/g, '') || 'No description provided for this sector.';
+                    const imgUrl = cols[5]?.replace(/"/g, '') || 'https://via.placeholder.com/400x250/05050a/00f2ff?text=No+Satellite+Image';
+                    const desc = cols[6]?.replace(/"/g, '') || 'No description found in sector.';
 
                     container.innerHTML += `
                         <div class="land-card">
@@ -204,27 +213,27 @@
                                 <span class="price-text">${price}</span>
                                 <h3 class="prop-name">${name}</h3>
                                 <div class="prop-loc">
-                                    <a href="${mapsUrl}" class="btn-maps" target="_blank">
-                                        <i class="fas fa-map-marker-alt" style="color:var(--electric-blue);"></i> VIEW TARGET LOCATION
+                                    <a href="${mapsLink}" class="btn-maps" target="_blank">
+                                        <i class="fas fa-map-marker-alt" style="color:var(--electric-blue);"></i> TARGET LOCATION
                                     </a>
                                 </div>
                                 <div class="prop-desc">${desc}</div>
-                                <a href="${sourceUrl}" class="btn-source" target="_blank">INVESTIGATE SOURCE DATA</a>
+                                <a href="${sourceUrl}" class="btn-source" target="_blank">INVESTIGATE SOURCE</a>
                             </div>
                             <div class="prop-footer">
-                                SECTOR ID: ${dateId} | CLAY COUNTY HUB SYNC
+                                SECTOR ID: ${dateId} | CLAY COUNTY REGISTRY
                             </div>
                         </div>
                     `;
                 }
             });
         } catch (err) {
-            console.error('Data Sync Failure:', err);
-            document.getElementById('land-grid').innerHTML = '<p style="color:red; text-align:center; font-family:Orbitron;">SYSTEM ERROR: UNABLE TO SYNC REGISTRY</p>';
+            console.error('Registry Sync Failed:', err);
+            document.getElementById('land-grid').innerHTML = '<p style="color:red; text-align:center; font-family:Orbitron;">REGISTRY OFFLINE: CHECK LINK STATUS</p>';
         }
     }
 
-    window.onload = fetchLandRegistry;
+    window.onload = syncLandData;
 </script>
 
 </body>
