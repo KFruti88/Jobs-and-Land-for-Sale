@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Clay County Community Hub | v1.24</title>
+    <title>Clay County Community Hub | v1.27</title>
 
     <script src="https://kfruti88.github.io/Universal-Menu-Bar/universal-menu.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -31,7 +31,7 @@
             animation: bgCycle 15s infinite alternate;
         }
 
-        /* Rental Portal Theme */
+        /* Rental Portal Theme (Yellow) */
         .theme-rentals {
             --theme-color: #ffff00;
             --theme-glow: rgba(255, 255, 0, 0.3);
@@ -65,6 +65,12 @@
             letter-spacing: 1px;
         }
         .tab-btn.active { background: var(--theme-color); color: #000; box-shadow: 0 0 15px var(--theme-glow); }
+
+        /* Target the word 'Rent' specifically */
+        .rent-highlight {
+            color: var(--rental-purple) !important; /* Forces purple even when button is active/black */
+            font-weight: bold;
+        }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 30px; }
 
@@ -153,7 +159,7 @@
     <div class="tab-nav">
         <button class="tab-btn active" id="btn-land" onclick="switchPortal('land')">Land for Sale</button>
         <button class="tab-btn" id="btn-hiring" onclick="switchPortal('hiring')">Now Hiring</button>
-        <button class="tab-btn" id="btn-rentals" onclick="switchPortal('rentals')">For Sale / Rent</button>
+        <button class="tab-btn" id="btn-rentals" onclick="switchPortal('rentals')">For Sale / <span class="rent-highlight">Rent</span></button>
     </div>
 
     <div class="grid" id="main-grid">
@@ -233,7 +239,6 @@
                     const desc = cols[6] || 'No further data found.';
                     const item = cols[7] || '';
 
-                    // Check for Monthly fee
                     const isRental = val.toLowerCase().includes("/mo");
                     const cardClass = isRental ? "item-card is-rental" : "item-card";
                     const rentalLabel = isRental ? `<span class="rental-tag"><i class="fas fa-key"></i> RENTAL</span>` : "";
