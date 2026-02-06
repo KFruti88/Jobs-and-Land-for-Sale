@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Clay County Land Portal | v1.19</title>
+    <title>Clay County Community Hub | v1.23</title>
 
     <script src="https://kfruti88.github.io/Universal-Menu-Bar/universal-menu.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,294 +15,213 @@
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@300;600;700&display=swap');
 
         :root {
-            --electric-blue: #00f2ff;
+            --theme-color: #00f2ff; /* Default Land Blue */
+            --theme-glow: rgba(0, 242, 255, 0.4);
             --deep-space: #05050a;
-            --thunder-glow: rgba(0, 242, 255, 0.4);
             --card-bg: rgba(15, 17, 35, 0.95);
             --highlight-yellow: #ffff00;
             --maroon-item: #800000;
         }
 
+        /* Hiring Theme: Cardinal Red & Color Cycle Background */
+        .theme-hiring {
+            --theme-color: #C41E3A;
+            --theme-glow: rgba(196, 30, 58, 0.4);
+            animation: bgCycle 15s infinite alternate;
+        }
+
+        /* Rental Theme: Bright Yellow */
+        .theme-rentals {
+            --theme-color: #ffff00;
+            --theme-glow: rgba(255, 255, 0, 0.3);
+        }
+
+        @keyframes bgCycle {
+            0% { background-color: #05050a; }
+            50% { background-color: #2e0505; }
+            100% { background-color: #1a0202; }
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--deep-space); color: #fff; font-family: 'Rajdhani', sans-serif; overflow-x: hidden; width: 100%; transition: background 0.5s ease; }
+        
+        .hero-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.6; }
+        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://www.transparenttextures.com/patterns/stardust.png'); opacity: 0.3; z-index: -1; }
+        
+        .wrapper { width: 90%; max-width: 1400px; margin: 60px auto; }
 
-        body {
-            background-color: var(--deep-space);
-            color: #fff;
-            font-family: 'Rajdhani', sans-serif;
-            overflow-x: hidden;
-            width: 100%;
+        /* Unified Tab Navigation */
+        .tab-nav { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; flex-wrap: wrap; }
+        .tab-btn {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--theme-color);
+            color: var(--theme-color);
+            padding: 12px 25px;
+            font-family: 'Orbitron', sans-serif;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.3s;
+            letter-spacing: 1px;
         }
+        .tab-btn.active { background: var(--theme-color); color: #000; box-shadow: 0 0 15px var(--theme-glow); }
 
-        /* Cinematic Space Background */
-        .hero-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #161b40 0%, #05050a 100%);
-            z-index: -1;
-        }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 30px; }
 
-        .stars {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://www.transparenttextures.com/patterns/stardust.png');
-            opacity: 0.3; z-index: -1;
-        }
-
-        /* Responsive 90% Width Container */
-        .wrapper { 
-            width: 90%; 
-            max-width: 1400px; 
-            margin: 60px auto; 
-            transition: width 0.3s ease;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-            gap: 30px;
-        }
-
-        /* Glossy Tech Card Design */
-        .land-card {
+        .item-card {
             background: var(--card-bg);
-            border: 1px solid rgba(0, 242, 255, 0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-top: 3px solid var(--theme-color);
             border-radius: 4px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             transition: 0.4s;
             backdrop-filter: blur(10px);
-            position: relative;
             height: 100%;
         }
+        .item-card:hover { border-color: var(--theme-color); box-shadow: 0 0 25px var(--theme-glow); transform: translateY(-5px); }
 
-        .land-card:hover {
-            border-color: var(--electric-blue);
-            box-shadow: 0 0 25px var(--thunder-glow);
-            transform: translateY(-5px);
-        }
+        .item-img { width: 100%; height: 250px; object-fit: cover; border-bottom: 1px solid rgba(255,255,255,0.1); background: #111; }
+        .card-body { padding: 30px; flex-grow: 1; display: flex; flex-direction: column; }
+        .price-badge { font-family: 'Orbitron', sans-serif; color: var(--theme-color); font-size: 1.5rem; display: block; margin-bottom: 12px; text-shadow: 0 0 10px var(--theme-glow); }
+        
+        .item-name { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; text-transform: uppercase; color: #fff; line-height: 1.4; white-space: normal; overflow: visible; word-wrap: break-word; margin-bottom: 10px; }
+        .item-loc { margin: 5px 0 20px 0; }
+        .btn-maps { color: #aaa; text-decoration: none; font-size: 0.9rem; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .btn-maps:hover { color: var(--theme-color); }
 
-        .prop-img {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            border-bottom: 2px solid var(--electric-blue);
-            background: #111;
-        }
+        .item-desc { color: #d1d1ff; font-size: 1rem; line-height: 1.6; margin-bottom: 25px; max-height: 300px; overflow-y: auto; white-space: pre-wrap; padding-right: 5px; }
+        
+        .btn-action { margin-top: auto; display: block; text-align: center; border: 1px solid var(--theme-color); color: var(--theme-color); text-decoration: none; padding: 14px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; transition: 0.3s; font-weight: bold; }
+        .btn-action:hover { background: var(--theme-color); color: #000; }
 
-        .card-body { 
-            padding: 30px; 
-            flex-grow: 1; 
-            display: flex; 
-            flex-direction: column; 
-        }
+        /* Unified Footer with Maroon Right Alignment */
+        .item-footer { padding: 12px 30px; background: rgba(0,0,0,0.6); display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); }
+        .footer-date { font-size: 0.85rem; color: var(--highlight-yellow); font-weight: bold; text-transform: uppercase; }
+        .footer-item { font-size: 0.85rem; color: var(--maroon-item); font-weight: bold; text-transform: uppercase; }
 
-        .price-text {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--electric-blue);
-            font-size: 1.5rem;
-            display: block;
-            margin-bottom: 12px;
-            text-shadow: 0 0 10px var(--thunder-glow);
-        }
-
-        .prop-name {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            margin: 0;
-            letter-spacing: 1px;
-            color: #fff;
-            line-height: 1.4;
-            display: block;
-            white-space: normal;
-            overflow: visible;
-            word-wrap: break-word;
-            margin-bottom: 10px;
-        }
-
-        .prop-loc { margin: 5px 0 20px 0; }
-
-        .btn-maps {
-            color: #aaa;
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.3s;
-        }
-
-        .btn-maps:hover { color: var(--electric-blue); }
-
-        .prop-desc {
-            color: #d1d1ff;
-            font-size: 1rem;
-            line-height: 1.6;
-            margin-bottom: 25px;
-            max-height: 300px; 
-            overflow-y: auto;
-            white-space: pre-wrap; 
-            padding-right: 5px;
-        }
-
-        .btn-source {
-            margin-top: auto;
-            display: block;
-            text-align: center;
-            border: 1px solid var(--electric-blue);
-            color: var(--electric-blue);
-            text-decoration: none;
-            padding: 14px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.85rem;
-            transition: 0.3s;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-
-        .btn-source:hover { background: var(--electric-blue); color: var(--deep-space); }
-
-        /* Footers with Smart Stacking Logic */
-        .prop-footer {
-            padding: 12px 30px;
-            background: rgba(0,0,0,0.6);
-            border-top: 1px solid rgba(0, 242, 255, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .footer-date {
-            font-size: 0.85rem;
-            color: var(--highlight-yellow);
-        }
-
-        .footer-item {
-            font-size: 0.85rem;
-            color: var(--maroon-item);
-        }
-
-        /* Mobile Responsive Overrides */
         @media (max-width: 768px) {
-            .wrapper { width: 95%; } /* Use more screen real estate on mobile */
-            .grid { grid-template-columns: 1fr; } /* Force single column vertical stack */
-            .prop-footer {
-                flex-direction: column;
-                gap: 8px;
-                text-align: center;
-            }
+            .wrapper { width: 95%; }
+            .grid { grid-template-columns: 1fr; }
+            .item-footer { flex-direction: column; gap: 8px; text-align: center; }
         }
     </style>
 </head>
 <body>
 
-<div class="hero-bg"></div>
+<div class="hero-bg" id="portal-bg"></div>
 <div class="stars"></div>
 
 <div class="wrapper">
-    <div class="grid" id="land-grid">
-        <p style="text-align:center; color:var(--electric-blue); font-family:'Orbitron'; padding: 100px;">
-            Establishing Secure Link to Land Registry...
-        </p>
+    <div class="tab-nav">
+        <button class="tab-btn active" id="btn-land" onclick="switchPortal('land')">Land for Sale</button>
+        <button class="tab-btn" id="btn-hiring" onclick="switchPortal('hiring')">Now Hiring</button>
+        <button class="tab-btn" id="btn-rentals" onclick="switchPortal('rentals')">For Sale / Rent</button>
+    </div>
+
+    <div class="grid" id="main-grid">
+        <p style="text-align:center; color:var(--theme-color); font-family:'Orbitron'; padding: 100px;">Establishing Neural Uplink...</p>
     </div>
 </div>
 
 <script>
-    // CSV URL for Land Registry (v1.19)
-    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT22Warsbi_J0ErAWQsF1WAVXQ9GQZwqWaZG1IDIU9M0ZjR9VniJmFtaPO2dNejCFS5jJO4ca2Jo0Ue/pub?gid=919890739&single=true&output=csv';
+    // PORTAL CONFIGURATION (v1.23)
+    const CONFIG = {
+        land: {
+            url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT22Warsbi_J0ErAWQsF1WAVXQ9GQZwqWaZG1IDIU9M0ZjR9VniJmFtaPO2dNejCFS5jJO4ca2Jo0Ue/pub?gid=919890739&single=true&output=csv',
+            themeClass: '',
+            showImg: true,
+            btnText: 'INVESTIGATE SOURCE'
+        },
+        hiring: {
+            url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTCcP-BhcoAC9wVqgmiR0J28sjZK53Cf53MYARsT47mFTzINIxUAOj0ttSUAeLA-iDTbJIXi_R9tElE/pub?output=csv',
+            themeClass: 'theme-hiring',
+            showImg: false,
+            btnText: 'APPLY / VIEW SOURCE'
+        },
+        rentals: {
+            url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTZ8bfoKwKy3toTv7iuEomaVT01uBqngjshVo_rQW17WyZPxSUsYdKwX0yMsrLrDMp0Y5xBIoOHHioy/pub?output=csv',
+            themeClass: 'theme-rentals',
+            showImg: true,
+            btnText: 'VIEW LISTING DETAILS'
+        }
+    };
 
-    /**
-     * ADVANCED CSV PARSER
-     * Handles formatted currency ($10,600,000) and line breaks.
-     */
     function parseCSV(text) {
-        const result = [];
-        let row = [];
-        let col = "";
-        let inQuotes = false;
-
+        const result = []; let row = []; let col = ""; let inQuotes = false;
         for (let i = 0; i < text.length; i++) {
-            const char = text[i];
-            const nextChar = text[i + 1];
-
-            if (char === '"' && inQuotes && nextChar === '"') {
-                col += '"'; i++;
-            } else if (char === '"') {
-                inQuotes = !inQuotes;
-            } else if (char === ',' && !inQuotes) {
-                row.push(col.trim()); col = "";
-            } else if ((char === '\r' || char === '\n') && !inQuotes) {
-                if (col !== "" || row.length > 0) {
-                    row.push(col.trim());
-                    result.push(row);
-                    row = []; col = "";
-                }
+            const char = text[i]; const nextChar = text[i+1];
+            if (char === '"' && inQuotes && nextChar === '"') { col += '"'; i++; }
+            else if (char === '"') inQuotes = !inQuotes;
+            else if (char === ',' && !inQuotes) { row.push(col.trim()); col = ""; }
+            else if ((char === '\r' || char === '\n') && !inQuotes) {
+                if (col !== "" || row.length > 0) { row.push(col.trim()); result.push(row); row = []; col = ""; }
                 if (char === '\r' && nextChar === '\n') i++; 
-            } else {
-                col += char;
-            }
+            } else col += char;
         }
-        if (col !== "" || row.length > 0) {
-            row.push(col.trim());
-            result.push(row);
-        }
+        if (col !== "" || row.length > 0) { row.push(col.trim()); result.push(row); }
         return result;
     }
 
-    async function syncLandData() {
+    async function switchPortal(type) {
+        // UI Updates
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`btn-${type}`).classList.add('active');
+        document.body.className = CONFIG[type].themeClass;
+        
+        const container = document.getElementById('main-grid');
+        container.innerHTML = `<p style="text-align:center; color:var(--theme-color); font-family:'Orbitron'; padding: 100px;">Syncing ${type.toUpperCase()} Registry...</p>`;
+
         try {
-            // Append a timestamp to the URL to bypass browser caching
-            const fetchUrl = `${CSV_URL}&cachebuster=${new Date().getTime()}`;
+            const fetchUrl = `${CONFIG[type].url}&cachebuster=${new Date().getTime()}`;
             const response = await fetch(fetchUrl);
             const rawData = await response.text();
-            
-            const dataRows = parseCSV(rawData).slice(1); 
-            const container = document.getElementById('land-grid');
+            const dataRows = parseCSV(rawData).slice(1);
             container.innerHTML = '';
 
             dataRows.forEach(cols => {
-                // Strict mapping for 8 columns (A-H)
-                if (cols && cols.length >= 7) {
+                // Handling Land/Rentals (8 cols) and Hiring (6+ cols)
+                if (cols && cols.length >= 6) {
                     const name = cols[0] || 'N/A';
-                    const mapsLink = cols[1] || '#';
-                    const price = cols[2] || 'N/A';
-                    const dateId = cols[3] || 'N/A';
-                    const sourceUrl = cols[4] || '#';
-                    const imgUrl = cols[5] || 'https://via.placeholder.com/400x250/05050a/00f2ff?text=No+Satellite+Image';
-                    const desc = cols[6] || 'No description found in sector.';
-                    const itemNum = cols[7] || ''; 
+                    const maps = cols[1] || '#';
+                    const val = cols[2] || 'N/A';
+                    const date = cols[3] || 'N/A';
+                    const src = cols[4] || '#';
+                    const img = cols[5] || '';
+                    const desc = cols[6] || 'No further data found.';
+                    const item = cols[7] || '';
+
+                    const imgHtml = (CONFIG[type].showImg && img) ? `<img src="${img}" class="item-img" onerror="this.style.display='none'">` : '';
 
                     container.innerHTML += `
-                        <div class="land-card">
-                            <img src="${imgUrl}" class="prop-img" onerror="this.src='https://via.placeholder.com/400x250/05050a/00f2ff?text=Imagery+Offline'">
+                        <div class="item-card">
+                            ${imgHtml}
                             <div class="card-body">
-                                <span class="price-text">${price}</span>
-                                <h3 class="prop-name">${name}</h3>
-                                <div class="prop-loc">
-                                    <a href="${mapsLink}" class="btn-maps" target="_blank">
-                                        <i class="fas fa-map-marker-alt" style="color:var(--electric-blue);"></i> TARGET LOCATION
+                                <span class="price-badge">${val}</span>
+                                <h3 class="item-name">${name}</h3>
+                                <div class="item-loc">
+                                    <a href="${maps}" class="btn-maps" target="_blank">
+                                        <i class="fas fa-map-marker-alt" style="color:var(--theme-color);"></i> TARGET LOCATION
                                     </a>
                                 </div>
-                                <div class="prop-desc">${desc}</div>
-                                <a href="${sourceUrl}" class="btn-source" target="_blank">INVESTIGATE SOURCE</a>
+                                <div class="item-desc">${desc}</div>
+                                <a href="${src}" class="btn-action" target="_blank">${CONFIG[type].btnText}</a>
                             </div>
-                            <div class="prop-footer">
-                                <span class="footer-date">SECTOR ID / DATE: ${dateId}</span>
-                                <span class="footer-item">ITEM #${itemNum}</span>
+                            <div class="item-footer">
+                                <span class="footer-date">ID / DATE: ${date}</span>
+                                <span class="footer-item">ITEM #${item}</span>
                             </div>
                         </div>
                     `;
                 }
             });
         } catch (err) {
-            console.error('Registry Sync Failed:', err);
-            document.getElementById('land-grid').innerHTML = '<p style="color:red; text-align:center; font-family:Orbitron;">REGISTRY OFFLINE: CHECK LINK STATUS</p>';
+            container.innerHTML = '<p style="color:red; text-align:center; font-family:Orbitron;">REGISTRY OFFLINE: CHECK SYNC STATUS</p>';
         }
     }
 
-    window.onload = syncLandData;
+    // Default Load
+    window.onload = () => switchPortal('land');
 </script>
 
 </body>
