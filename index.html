@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Clay County Land Portal | v1.18</title>
+    <title>Clay County Land Portal | v1.19</title>
 
     <script src="https://kfruti88.github.io/Universal-Menu-Bar/universal-menu.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -20,7 +20,7 @@
             --thunder-glow: rgba(0, 242, 255, 0.4);
             --card-bg: rgba(15, 17, 35, 0.95);
             --highlight-yellow: #ffff00;
-            --maroon-item: #800000; /* Maroon Item Font */
+            --maroon-item: #800000;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -46,8 +46,13 @@
             opacity: 0.3; z-index: -1;
         }
 
-        /* Standard 90% Width Container */
-        .wrapper { width: 90%; max-width: 1400px; margin: 60px auto; }
+        /* Responsive 90% Width Container */
+        .wrapper { 
+            width: 90%; 
+            max-width: 1400px; 
+            margin: 60px auto; 
+            transition: width 0.3s ease;
+        }
 
         .grid {
             display: grid;
@@ -134,9 +139,9 @@
             font-size: 1rem;
             line-height: 1.6;
             margin-bottom: 25px;
-            max-height: 250px;
+            max-height: 300px; 
             overflow-y: auto;
-            white-space: pre-wrap;
+            white-space: pre-wrap; 
             padding-right: 5px;
         }
 
@@ -157,34 +162,37 @@
 
         .btn-source:hover { background: var(--electric-blue); color: var(--deep-space); }
 
-        /* MULTI-ELEMENT FOOTER */
+        /* Footers with Smart Stacking Logic */
         .prop-footer {
             padding: 12px 30px;
             background: rgba(0,0,0,0.6);
-            display: flex;
-            justify-content: space-between; /* Pushes ID left, Item right */
-            align-items: center;
             border-top: 1px solid rgba(0, 242, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            text-transform: uppercase;
         }
 
         .footer-date {
             font-size: 0.85rem;
-            color: var(--highlight-yellow); /* Yellow Date */
-            text-transform: uppercase;
-            font-weight: bold;
+            color: var(--highlight-yellow);
         }
 
         .footer-item {
             font-size: 0.85rem;
-            color: var(--maroon-item); /* Maroon Item Number */
-            text-transform: uppercase;
-            font-weight: bold;
+            color: var(--maroon-item);
         }
 
+        /* Mobile Responsive Overrides */
         @media (max-width: 768px) {
-            .wrapper { width: 95%; }
-            .grid { grid-template-columns: 1fr; }
-            .prop-footer { flex-direction: column; gap: 5px; align-items: flex-start; }
+            .wrapper { width: 95%; } /* Use more screen real estate on mobile */
+            .grid { grid-template-columns: 1fr; } /* Force single column vertical stack */
+            .prop-footer {
+                flex-direction: column;
+                gap: 8px;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -196,17 +204,18 @@
 <div class="wrapper">
     <div class="grid" id="land-grid">
         <p style="text-align:center; color:var(--electric-blue); font-family:'Orbitron'; padding: 100px;">
-            Establishing Neural Link to Land Registry...
+            Establishing Secure Link to Land Registry...
         </p>
     </div>
 </div>
 
 <script>
+    // CSV URL for Land Registry (v1.19)
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT22Warsbi_J0ErAWQsF1WAVXQ9GQZwqWaZG1IDIU9M0ZjR9VniJmFtaPO2dNejCFS5jJO4ca2Jo0Ue/pub?gid=919890739&single=true&output=csv';
 
     /**
-     * ADVANCED CSV PARSER (v1.18)
-     * Handles formatted currency ($10,600,000) and commas inside cells.
+     * ADVANCED CSV PARSER
+     * Handles formatted currency ($10,600,000) and line breaks.
      */
     function parseCSV(text) {
         const result = [];
@@ -219,7 +228,7 @@
             const nextChar = text[i + 1];
 
             if (char === '"' && inQuotes && nextChar === '"') {
-                col += '"'; i++; // Escaped quote
+                col += '"'; i++;
             } else if (char === '"') {
                 inQuotes = !inQuotes;
             } else if (char === ',' && !inQuotes) {
@@ -244,24 +253,26 @@
 
     async function syncLandData() {
         try {
-            const response = await fetch(CSV_URL);
+            // Append a timestamp to the URL to bypass browser caching
+            const fetchUrl = `${CSV_URL}&cachebuster=${new Date().getTime()}`;
+            const response = await fetch(fetchUrl);
             const rawData = await response.text();
             
-            // Parse all 8 columns correctly
             const dataRows = parseCSV(rawData).slice(1); 
             const container = document.getElementById('land-grid');
             container.innerHTML = '';
 
             dataRows.forEach(cols => {
+                // Strict mapping for 8 columns (A-H)
                 if (cols && cols.length >= 7) {
                     const name = cols[0] || 'N/A';
                     const mapsLink = cols[1] || '#';
-                    const price = cols[2] || 'N/A'; // Correctly preserves $ and ,
+                    const price = cols[2] || 'N/A';
                     const dateId = cols[3] || 'N/A';
                     const sourceUrl = cols[4] || '#';
                     const imgUrl = cols[5] || 'https://via.placeholder.com/400x250/05050a/00f2ff?text=No+Satellite+Image';
                     const desc = cols[6] || 'No description found in sector.';
-                    const itemNum = cols[7] || ''; // NEW Column H: Item Number
+                    const itemNum = cols[7] || ''; 
 
                     container.innerHTML += `
                         <div class="land-card">
