@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Clay County Community Hub | v1.23</title>
+    <title>Clay County Community Hub | v1.24</title>
 
     <script src="https://kfruti88.github.io/Universal-Menu-Bar/universal-menu.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -21,16 +21,17 @@
             --card-bg: rgba(15, 17, 35, 0.95);
             --highlight-yellow: #ffff00;
             --maroon-item: #800000;
+            --rental-purple: #bc13fe;
         }
 
-        /* Hiring Theme: Cardinal Red & Color Cycle Background */
+        /* Hiring Theme */
         .theme-hiring {
             --theme-color: #C41E3A;
             --theme-glow: rgba(196, 30, 58, 0.4);
             animation: bgCycle 15s infinite alternate;
         }
 
-        /* Rental Theme: Bright Yellow */
+        /* Rental Portal Theme */
         .theme-rentals {
             --theme-color: #ffff00;
             --theme-glow: rgba(255, 255, 0, 0.3);
@@ -76,15 +77,50 @@
             display: flex;
             flex-direction: column;
             transition: 0.4s;
+            position: relative;
             backdrop-filter: blur(10px);
             height: 100%;
         }
         .item-card:hover { border-color: var(--theme-color); box-shadow: 0 0 25px var(--theme-glow); transform: translateY(-5px); }
 
+        /* Monthly Rental Highlight Styling */
+        .is-rental {
+            border-top: 4px solid var(--rental-purple);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.2);
+        }
+        .is-rental::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+            transform: skewX(-25deg);
+            transition: none;
+            animation: shine 4s infinite;
+        }
+        @keyframes shine {
+            0% { left: -100%; }
+            20% { left: 150%; }
+            100% { left: 150%; }
+        }
+
+        .rental-tag {
+            background: var(--rental-purple);
+            color: white;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            border-radius: 3px;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+
         .item-img { width: 100%; height: 250px; object-fit: cover; border-bottom: 1px solid rgba(255,255,255,0.1); background: #111; }
         .card-body { padding: 30px; flex-grow: 1; display: flex; flex-direction: column; }
         .price-badge { font-family: 'Orbitron', sans-serif; color: var(--theme-color); font-size: 1.5rem; display: block; margin-bottom: 12px; text-shadow: 0 0 10px var(--theme-glow); }
-        
+        .is-rental .price-badge { color: var(--rental-purple); text-shadow: 0 0 10px rgba(188, 19, 254, 0.6); }
+
         .item-name { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; text-transform: uppercase; color: #fff; line-height: 1.4; white-space: normal; overflow: visible; word-wrap: break-word; margin-bottom: 10px; }
         .item-loc { margin: 5px 0 20px 0; }
         .btn-maps { color: #aaa; text-decoration: none; font-size: 0.9rem; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
@@ -94,8 +130,9 @@
         
         .btn-action { margin-top: auto; display: block; text-align: center; border: 1px solid var(--theme-color); color: var(--theme-color); text-decoration: none; padding: 14px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; transition: 0.3s; font-weight: bold; }
         .btn-action:hover { background: var(--theme-color); color: #000; }
+        .is-rental .btn-action { border-color: var(--rental-purple); color: var(--rental-purple); }
+        .is-rental .btn-action:hover { background: var(--rental-purple); color: #fff; }
 
-        /* Unified Footer with Maroon Right Alignment */
         .item-footer { padding: 12px 30px; background: rgba(0,0,0,0.6); display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); }
         .footer-date { font-size: 0.85rem; color: var(--highlight-yellow); font-weight: bold; text-transform: uppercase; }
         .footer-item { font-size: 0.85rem; color: var(--maroon-item); font-weight: bold; text-transform: uppercase; }
@@ -125,7 +162,6 @@
 </div>
 
 <script>
-    // PORTAL CONFIGURATION (v1.23)
     const CONFIG = {
         land: {
             url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT22Warsbi_J0ErAWQsF1WAVXQ9GQZwqWaZG1IDIU9M0ZjR9VniJmFtaPO2dNejCFS5jJO4ca2Jo0Ue/pub?gid=919890739&single=true&output=csv',
@@ -164,7 +200,6 @@
     }
 
     async function switchPortal(type) {
-        // UI Updates
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(`btn-${type}`).classList.add('active');
         document.body.className = CONFIG[type].themeClass;
@@ -176,11 +211,18 @@
             const fetchUrl = `${CONFIG[type].url}&cachebuster=${new Date().getTime()}`;
             const response = await fetch(fetchUrl);
             const rawData = await response.text();
-            const dataRows = parseCSV(rawData).slice(1);
+            let dataRows = parseCSV(rawData).slice(1);
+            
+            // Priority Logic: Rentals pinned to top
+            dataRows.sort((a, b) => {
+                const aIsRental = (a[2] || "").toLowerCase().includes("/mo");
+                const bIsRental = (b[2] || "").toLowerCase().includes("/mo");
+                return bIsRental - aIsRental; 
+            });
+
             container.innerHTML = '';
 
             dataRows.forEach(cols => {
-                // Handling Land/Rentals (8 cols) and Hiring (6+ cols)
                 if (cols && cols.length >= 6) {
                     const name = cols[0] || 'N/A';
                     const maps = cols[1] || '#';
@@ -191,13 +233,18 @@
                     const desc = cols[6] || 'No further data found.';
                     const item = cols[7] || '';
 
+                    // Check for Monthly fee
+                    const isRental = val.toLowerCase().includes("/mo");
+                    const cardClass = isRental ? "item-card is-rental" : "item-card";
+                    const rentalLabel = isRental ? `<span class="rental-tag"><i class="fas fa-key"></i> RENTAL</span>` : "";
+
                     const imgHtml = (CONFIG[type].showImg && img) ? `<img src="${img}" class="item-img" onerror="this.style.display='none'">` : '';
 
                     container.innerHTML += `
-                        <div class="item-card">
+                        <div class="${cardClass}">
                             ${imgHtml}
                             <div class="card-body">
-                                <span class="price-badge">${val}</span>
+                                <span class="price-badge">${val}${rentalLabel}</span>
                                 <h3 class="item-name">${name}</h3>
                                 <div class="item-loc">
                                     <a href="${maps}" class="btn-maps" target="_blank">
@@ -220,7 +267,6 @@
         }
     }
 
-    // Default Load
     window.onload = () => switchPortal('land');
 </script>
 
