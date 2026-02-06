@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Clay County Land Portal | v1.14</title>
+    <title>Clay County Land Portal | v1.16</title>
 
     <script src="https://kfruti88.github.io/Universal-Menu-Bar/universal-menu.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -48,7 +48,6 @@
         /* Standard 90% Width Container */
         .wrapper { width: 90%; max-width: 1400px; margin: 60px auto; }
 
-        /* Listing Grid */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
@@ -66,7 +65,7 @@
             transition: 0.4s;
             backdrop-filter: blur(10px);
             position: relative;
-            height: 100%; /* Ensures cards in the same row align but can grow */
+            height: 100%;
         }
 
         .land-card:hover {
@@ -99,7 +98,7 @@
             text-shadow: 0 0 10px var(--thunder-glow);
         }
 
-        /* FIXED: Full Text Visibility for Property Name */
+        /* FULL NAME FIX: Allowed text to wrap and show completely */
         .prop-name {
             font-family: 'Orbitron', sans-serif;
             font-size: 1.2rem;
@@ -109,9 +108,9 @@
             color: #fff;
             line-height: 1.4;
             display: block;
-            white-space: normal; /* Allows text to wrap naturally */
-            overflow: visible;     /* Removes any snippet/clipping behavior */
-            word-wrap: break-word; /* Safety for very long technical strings */
+            white-space: normal;
+            overflow: visible;
+            word-wrap: break-word;
             margin-bottom: 10px;
         }
 
@@ -130,18 +129,20 @@
 
         .btn-maps:hover { color: var(--electric-blue); }
 
+        /* FULL DESCRIPTION FIX: Respects line breaks and expands */
         .prop-desc {
             color: #d1d1ff;
             font-size: 1rem;
             line-height: 1.6;
             margin-bottom: 25px;
-            max-height: 200px; /* Increased slightly for longer descriptions */
+            max-height: 300px; /* Increased room for descriptions */
             overflow-y: auto;
+            white-space: pre-wrap; /* Keeps your emojis and line breaks exactly as they are in Sheets */
             padding-right: 5px;
         }
 
         .btn-source {
-            margin-top: auto; /* Pushes the button to the bottom of the card body */
+            margin-top: auto;
             display: block;
             text-align: center;
             border: 1px solid var(--electric-blue);
@@ -157,7 +158,7 @@
 
         .btn-source:hover { background: var(--electric-blue); color: var(--deep-space); }
 
-        /* Footer with Yellow Highlighted Date/ID */
+        /* Yellow Highlighted Date/ID */
         .prop-footer {
             padding: 12px 30px;
             background: rgba(0,0,0,0.6);
@@ -168,7 +169,6 @@
             font-weight: bold;
         }
 
-        /* Responsive Mobile Layout */
         @media (max-width: 768px) {
             .wrapper { width: 95%; }
             .grid { grid-template-columns: 1fr; }
@@ -183,36 +183,72 @@
 <div class="wrapper">
     <div class="grid" id="land-grid">
         <p style="text-align:center; color:var(--electric-blue); font-family:'Orbitron'; padding: 100px;">
-            Establishing Link to Land Registry...
+            Establishing Neural Link to Land Registry...
         </p>
     </div>
 </div>
 
 <script>
-    // CSV URL for Land Registry
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT22Warsbi_J0ErAWQsF1WAVXQ9GQZwqWaZG1IDIU9M0ZjR9VniJmFtaPO2dNejCFS5jJO4ca2Jo0Ue/pub?gid=919890739&single=true&output=csv';
+
+    /**
+     * ADVANCED CSV PARSER (v1.16)
+     * Correctly handles spaces, commas, and newlines inside quoted cells.
+     */
+    function parseCSV(text) {
+        const result = [];
+        let row = [];
+        let col = "";
+        let inQuotes = false;
+
+        for (let i = 0; i < text.length; i++) {
+            const char = text[i];
+            const nextChar = text[i + 1];
+
+            if (char === '"' && inQuotes && nextChar === '"') {
+                col += '"'; i++; // Handle escaped double quotes
+            } else if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+                row.push(col.trim()); col = "";
+            } else if ((char === '\r' || char === '\n') && !inQuotes) {
+                if (col !== "" || row.length > 0) {
+                    row.push(col.trim());
+                    result.push(row);
+                    row = []; col = "";
+                }
+                if (char === '\r' && nextChar === '\n') i++; // Skip extra line break character
+            } else {
+                col += char;
+            }
+        }
+        if (col !== "" || row.length > 0) {
+            row.push(col.trim());
+            result.push(row);
+        }
+        return result;
+    }
 
     async function syncLandData() {
         try {
             const response = await fetch(CSV_URL);
-            const data = await response.text();
+            const rawData = await response.text();
             
-            const rows = data.split('\n').slice(1).filter(row => row.trim() !== '');
+            // Deep-parse the entire spreadsheet at once
+            const dataRows = parseCSV(rawData).slice(1); 
             const container = document.getElementById('land-grid');
             container.innerHTML = '';
 
-            rows.forEach(row => {
-                // Mapping: A=Name, B=Location/Maps, C=Price, D=Date/ID, E=Source, F=Image, G=Description
-                const cols = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-
+            dataRows.forEach(cols => {
+                // Strictly mapping your A-G layout
                 if (cols && cols.length >= 7) {
-                    const name = cols[0]?.replace(/"/g, '') || 'N/A';
-                    const mapsLink = cols[1]?.replace(/"/g, '') || '#';
-                    const price = cols[2]?.replace(/"/g, '') || 'N/A';
-                    const dateId = cols[3]?.replace(/"/g, '') || 'N/A';
-                    const sourceUrl = cols[4]?.replace(/"/g, '') || '#';
-                    const imgUrl = cols[5]?.replace(/"/g, '') || 'https://via.placeholder.com/400x250/05050a/00f2ff?text=No+Satellite+Image';
-                    const desc = cols[6]?.replace(/"/g, '') || 'No description found in sector.';
+                    const name = cols[0] || 'N/A';
+                    const mapsLink = cols[1] || '#';
+                    const price = cols[2] || 'N/A';
+                    const dateId = cols[3] || 'N/A';
+                    const sourceUrl = cols[4] || '#';
+                    const imgUrl = cols[5] || 'https://via.placeholder.com/400x250/05050a/00f2ff?text=No+Satellite+Image';
+                    const desc = cols[6] || 'No description found in sector.';
 
                     container.innerHTML += `
                         <div class="land-card">
