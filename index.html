@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Clay County Community Hub | v1.27</title>
+    <title>Clay County Community Hub | v1.30</title>
 
     <script src="https://kfruti88.github.io/Universal-Menu-Bar/universal-menu.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,7 +15,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@300;600;700&display=swap');
 
         :root {
-            --theme-color: #00f2ff; /* Default Land Blue */
+            --theme-color: #00f2ff;
             --theme-glow: rgba(0, 242, 255, 0.4);
             --deep-space: #05050a;
             --card-bg: rgba(15, 17, 35, 0.95);
@@ -24,14 +24,12 @@
             --rental-purple: #bc13fe;
         }
 
-        /* Hiring Theme */
         .theme-hiring {
             --theme-color: #C41E3A;
             --theme-glow: rgba(196, 30, 58, 0.4);
             animation: bgCycle 15s infinite alternate;
         }
 
-        /* Rental Portal Theme (Yellow) */
         .theme-rentals {
             --theme-color: #ffff00;
             --theme-glow: rgba(255, 255, 0, 0.3);
@@ -51,7 +49,6 @@
         
         .wrapper { width: 90%; max-width: 1400px; margin: 60px auto; }
 
-        /* Unified Tab Navigation */
         .tab-nav { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; flex-wrap: wrap; }
         .tab-btn {
             background: rgba(0,0,0,0.5);
@@ -66,9 +63,8 @@
         }
         .tab-btn.active { background: var(--theme-color); color: #000; box-shadow: 0 0 15px var(--theme-glow); }
 
-        /* Target the word 'Rent' specifically */
         .rent-highlight {
-            color: var(--rental-purple) !important; /* Forces purple even when button is active/black */
+            color: var(--rental-purple) !important;
             font-weight: bold;
         }
 
@@ -89,7 +85,6 @@
         }
         .item-card:hover { border-color: var(--theme-color); box-shadow: 0 0 25px var(--theme-glow); transform: translateY(-5px); }
 
-        /* Monthly Rental Highlight Styling */
         .is-rental {
             border-top: 4px solid var(--rental-purple);
             box-shadow: 0 0 15px rgba(188, 19, 254, 0.2);
@@ -103,7 +98,6 @@
             height: 100%;
             background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
             transform: skewX(-25deg);
-            transition: none;
             animation: shine 4s infinite;
         }
         @keyframes shine {
@@ -127,7 +121,7 @@
         .price-badge { font-family: 'Orbitron', sans-serif; color: var(--theme-color); font-size: 1.5rem; display: block; margin-bottom: 12px; text-shadow: 0 0 10px var(--theme-glow); }
         .is-rental .price-badge { color: var(--rental-purple); text-shadow: 0 0 10px rgba(188, 19, 254, 0.6); }
 
-        .item-name { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; text-transform: uppercase; color: #fff; line-height: 1.4; white-space: normal; overflow: visible; word-wrap: break-word; margin-bottom: 10px; }
+        .item-name { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; text-transform: uppercase; color: #fff; line-height: 1.4; margin-bottom: 10px; }
         .item-loc { margin: 5px 0 20px 0; }
         .btn-maps { color: #aaa; text-decoration: none; font-size: 0.9rem; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
         .btn-maps:hover { color: var(--theme-color); }
@@ -219,53 +213,69 @@
             const rawData = await response.text();
             let dataRows = parseCSV(rawData).slice(1);
             
-            // Priority Logic: Rentals pinned to top
-            dataRows.sort((a, b) => {
-                const aIsRental = (a[2] || "").toLowerCase().includes("/mo");
-                const bIsRental = (b[2] || "").toLowerCase().includes("/mo");
-                return bIsRental - aIsRental; 
-            });
+            // Priority logic only for Sale/Rentals
+            if (type !== 'hiring') {
+                dataRows.sort((a, b) => {
+                    const aIsRental = (a[2] || "").toLowerCase().includes("/mo");
+                    const bIsRental = (b[2] || "").toLowerCase().includes("/mo");
+                    return bIsRental - aIsRental; 
+                });
+            }
 
             container.innerHTML = '';
 
             dataRows.forEach(cols => {
-                if (cols && cols.length >= 6) {
-                    const name = cols[0] || 'N/A';
-                    const maps = cols[1] || '#';
-                    const val = cols[2] || 'N/A';
-                    const date = cols[3] || 'N/A';
-                    const src = cols[4] || '#';
-                    const img = cols[5] || '';
-                    const desc = cols[6] || 'No further data found.';
-                    const item = cols[7] || '';
+                let name, maps, val, date, src, img, desc, item;
 
-                    const isRental = val.toLowerCase().includes("/mo");
-                    const cardClass = isRental ? "item-card is-rental" : "item-card";
-                    const rentalLabel = isRental ? `<span class="rental-tag"><i class="fas fa-key"></i> RENTAL</span>` : "";
-
-                    const imgHtml = (CONFIG[type].showImg && img) ? `<img src="${img}" class="item-img" onerror="this.style.display='none'">` : '';
-
-                    container.innerHTML += `
-                        <div class="${cardClass}">
-                            ${imgHtml}
-                            <div class="card-body">
-                                <span class="price-badge">${val}${rentalLabel}</span>
-                                <h3 class="item-name">${name}</h3>
-                                <div class="item-loc">
-                                    <a href="${maps}" class="btn-maps" target="_blank">
-                                        <i class="fas fa-map-marker-alt" style="color:var(--theme-color);"></i> Click here for Map
-                                    </a>
-                                </div>
-                                <div class="item-desc">${desc}</div>
-                                <a href="${src}" class="btn-action" target="_blank">${CONFIG[type].btnText}</a>
-                            </div>
-                            <div class="item-footer">
-                                <span class="footer-date">ID / DATE: ${date}</span>
-                                <span class="footer-item">ITEM #${item}</span>
-                            </div>
-                        </div>
-                    `;
+                // SPECIFIC HIRING MAPPING PER YOUR SCREENSHOT
+                if (type === 'hiring') {
+                    name = cols[0] || 'N/A'; // Col A: Job Name
+                    maps = cols[1] || '#';   // Col B: Map Link
+                    val  = cols[2] || 'N/A'; // Col C: Pay
+                    src  = cols[3] || '#';   // Col D: Source (Apply Link) - NOW ON THE BUTTON
+                    desc = cols[4] || 'No description provided.'; // Col E: Description
+                    item = cols[6] || 'N/A'; // Col G: Item Number
+                    date = '';               // Hiring has no date column
+                    img  = ''; 
+                } else {
+                    // Standard Land/Rental Mapping
+                    name = cols[0] || 'N/A';
+                    maps = cols[1] || '#';
+                    val  = cols[2] || 'N/A';
+                    date = cols[3] || 'N/A';
+                    src  = cols[4] || '#';
+                    img  = cols[5] || '';
+                    desc = cols[6] || 'No further data found.';
+                    item = cols[7] || '';
                 }
+
+                if (name === 'N/A' && val === 'N/A') return;
+
+                const isRental = val.toLowerCase().includes("/mo");
+                const cardClass = isRental ? "item-card is-rental" : "item-card";
+                const rentalLabel = isRental ? `<span class="rental-tag"><i class="fas fa-key"></i> RENTAL</span>` : "";
+                const imgHtml = (CONFIG[type].showImg && img) ? `<img src="${img}" class="item-img" onerror="this.style.display='none'">` : '';
+
+                container.innerHTML += `
+                    <div class="${cardClass}">
+                        ${imgHtml}
+                        <div class="card-body">
+                            <span class="price-badge">${val}${rentalLabel}</span>
+                            <h3 class="item-name">${name}</h3>
+                            <div class="item-loc">
+                                <a href="${maps}" class="btn-maps" target="_blank">
+                                    <i class="fas fa-map-marker-alt" style="color:var(--theme-color);"></i> Click here for Map
+                                </a>
+                            </div>
+                            <div class="item-desc">${desc}</div>
+                            <a href="${src}" class="btn-action" target="_blank">${CONFIG[type].btnText}</a>
+                        </div>
+                        <div class="item-footer">
+                            <span class="footer-date">${type === 'hiring' ? '' : 'ID / DATE: ' + date}</span>
+                            <span class="footer-item">ITEM #${item}</span>
+                        </div>
+                    </div>
+                `;
             });
         } catch (err) {
             container.innerHTML = '<p style="color:red; text-align:center; font-family:Orbitron;">REGISTRY OFFLINE: CHECK SYNC STATUS</p>';
