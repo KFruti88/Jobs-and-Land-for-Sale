@@ -3,73 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clay County Community Listings</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Clay County Community Listings | v1.02</title>
     <style>
+        /* Glossy Modern Theme */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+            --glossy-white: rgba(255, 255, 255, 0.9);
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.6;
-            color: #333;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
+            color: #2c3e50;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
         header {
-            border-bottom: 2px solid #eee;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
+            background: var(--primary-gradient);
+            color: white;
+            padding: 40px 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
         }
-        h1 { color: #2c3e50; }
-        h2 { color: #34495e; border-bottom: 1px solid #eee; padding-bottom: 0.5rem; margin-top: 2rem; }
-        .section { margin-bottom: 2rem; }
-        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background-color: #f8f9fa; }
-        .listing-card {
+
+        header h1 { margin: 0; font-size: 2.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+
+        /* Tabs Styling */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 25px;
+            border: none;
             background: #fff;
-            border: 1px solid #e1e4e8;
-            border-radius: 6px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .listing-card h3 { margin-top: 0; color: #0366d6; }
+
+        .tab-btn.active {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .tab-content { display: none; width: 100%; }
+        .tab-content.active { display: block; animation: fadeIn 0.5s; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Listing Cards */
+        .listing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .listing-card {
+            background: var(--glossy-white);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease;
+        }
+
+        .listing-card:hover { transform: translateY(-5px); }
+
+        .listing-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background: #ddd;
+        }
+
         .btn {
             display: inline-block;
-            background-color: #28a745;
+            background: var(--primary-gradient);
             color: white;
-            padding: 8px 16px;
+            padding: 10px 20px;
             text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
+            border-radius: 25px;
+            font-weight: 600;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
         }
-        .btn:hover { background-color: #218838; }
+
+        .btn:hover { opacity: 0.9; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; color: #2c3e50; }
+
         footer {
-            margin-top: 4rem;
-            padding-top: 2rem;
-            border-top: 1px solid #eee;
-            font-size: 0.9rem;
-            color: #666;
+            text-align: center;
+            margin-top: 50px;
+            padding: 30px;
+            color: #7f8c8d;
+        }
+
+        /* Mobile Stacking */
+        @media (max-width: 768px) {
+            .container { width: 95%; }
+            .listing-grid { grid-template-columns: 1fr; }
+            th, td { display: block; width: 100%; }
+            tr { border-bottom: 2px solid #ddd; }
         }
     </style>
 </head>
 <body>
 
+<div class="container">
     <header>
-        <h1>📋 Clay County Community Listings</h1>
-        <p>Welcome to the central repository for local job openings, land for sale, and rental listings in Clay County, Illinois. This project is optimized for quick updates and clear user navigation.</p>
+        <h1>📋 Clay County Listings</h1>
+        <p>Your local hub for Careers, Land, and Rentals in Clay County, IL.</p>
     </header>
 
-    <section class="section">
-        <h2>🛠️ How to Use This Repository</h2>
-        <ul>
-            <li><strong>Hiring:</strong> Browse current job openings in the Flora and Clay County area and apply directly.</li>
-            <li><strong>Land for Sale:</strong> View available plots with pricing, locations, and original source data.</li>
-            <li><strong>Rentals:</strong> Find your next home with a breakdown of pricing and included utilities.</li>
-        </ul>
-    </section>
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('hiring')">💼 Hiring</button>
+        <button class="tab-btn" onclick="openTab('land')">🌳 Land for Sale</button>
+        <button class="tab-btn" onclick="openTab('rentals')">🏠 Rentals</button>
+    </div>
 
-    <section class="section">
-        <h2>💼 Current Hiring Opportunities</h2>
+    <div id="hiring" class="tab-content active">
         <table>
             <thead>
                 <tr>
@@ -80,78 +174,63 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>S & K Ventures</td>
+                    <td><strong>S & K Ventures</strong></td>
                     <td>Digital Sign Technician</td>
-                    <td><a href="#" class="btn">Apply Now</a></td>
+                    <td><a href="https://skventuresigns.com" class="btn">Apply Now</a></td>
                 </tr>
                 <tr>
-                    <td>Flora Local Business</td>
+                    <td><strong>Flora Local Business</strong></td>
                     <td>General Laborer</td>
-                    <td><a href="#" class="btn">Apply Now</a></td>
-                </tr>
-                <tr>
-                    <td>Clay County Service</td>
-                    <td>Maintenance Worker</td>
                     <td><a href="#" class="btn">Apply Now</a></td>
                 </tr>
             </tbody>
         </table>
-        <p><small>Note: Ensure all applications are submitted through the official links provided in the "Action" column.</small></p>
-    </section>
+    </div>
 
-    <section class="section">
-        <h2>🌳 Land for Sale</h2>
-        
-        <div class="listing-card">
-            <h3>[Property Name/Lot Number]</h3>
-            <p><strong>Description:</strong> High-elevation lot with mature timber and road access. Perfect for residential development or agricultural use.</p>
-            <p><strong>Price:</strong> $N/A</p>
-            <p><strong>Location:</strong> Clay County, IL</p>
-            <p><a href="#" class="btn">View Details</a></p>
+    <div id="land" class="tab-content">
+        <div class="listing-grid">
+            <div class="listing-card">
+                <img src="https://via.placeholder.com/300x180?text=Property+Image" alt="Land Image" class="listing-image">
+                <h3>Mayflower Rd</h3>
+                <p><strong>Location:</strong> Clay City, IL</p>
+                <p><strong>Price:</strong> $N/A</p>
+                <p><strong>Bio:</strong> 10-digit ASIN or brief description here.</p>
+                <a href="https://www.landsearch.com/properties/mayflower-rd-clay-city-il-62824/3914159" class="btn" target="_blank">View Source</a>
+            </div>
         </div>
+    </div>
 
-        <div class="listing-card">
-            <h3>Mayflower Rd, Clay City, IL (Listing #3914159)</h3>
-            <p><strong>Description:</strong> Check source for details.</p>
-            <p><strong>Price:</strong> $N/A</p>
-            <p><strong>Location:</strong> Clay City, IL</p>
-            <p><a href="https://www.landsearch.com/properties/mayflower-rd-clay-city-il-62824/3914159" class="btn" target="_blank">View Listing</a></p>
+    <div id="rentals" class="tab-content">
+        <div class="listing-grid">
+            <div class="listing-card">
+                <h3>Main Street Apartment</h3>
+                <p><strong>Address:</strong> Flora, IL</p>
+                <p><strong>Price:</strong> $N/A / month</p>
+                <p><strong>Included:</strong> Water & Trash</p>
+                <p><strong>Details:</strong> 2 Bed, 1 Bath near downtown.</p>
+                <a href="#" class="btn">Read More</a>
+            </div>
         </div>
-
-        <div class="listing-card">
-            <h3>Mayflower Rd, Clay City, IL (Listing #4033788)</h3>
-            <p><strong>Description:</strong> Check source for details.</p>
-            <p><strong>Price:</strong> $N/A</p>
-            <p><strong>Location:</strong> Clay City, IL</p>
-            <p><a href="https://www.landsearch.com/properties/mayflower-rd-clay-city-il-62824/4033788" class="btn" target="_blank">View Listing</a></p>
-        </div>
-    </section>
-
-    <section class="section">
-        <h2>🏠 Rental Listings</h2>
-        
-        <div class="listing-card">
-            <h3>[Street Address], Flora, IL</h3>
-            <p><strong>Price:</strong> $N/A / month</p>
-            <p><strong>Included:</strong> [e.g., Water, Trash Pickup, etc.]</p>
-            <p><strong>Brief Info:</strong> [e.g., 2 Bedroom, 1 Bath. Recently renovated kitchen.]</p>
-            <p><a href="#" class="btn">Read More & View Source</a></p>
-        </div>
-
-        <div class="listing-card">
-            <h3>[Street Address], Iola, IL</h3>
-            <p><strong>Price:</strong> $N/A / month</p>
-            <p><strong>Included:</strong> [e.g., Lawn Maintenance]</p>
-            <p><strong>Brief Info:</strong> [e.g., Cozy 1-bedroom unit near the city center.]</p>
-            <p><a href="#" class="btn">Read More & View Source</a></p>
-        </div>
-    </section>
+    </div>
 
     <footer>
-        <h2>📝 Maintenance & Updates</h2>
-        <p>To add a new listing, follow the existing formatting patterns above. Ensure all images are hosted on GitHub or a reliable CDN to prevent broken links.</p>
+        <p><strong>Maintenance:</strong> Update via the A–N Column Structure spreadsheet.</p>
         <p><strong>Last Updated:</strong> February 5, 2026</p>
     </footer>
+</div>
+
+<script>
+    function openTab(tabName) {
+        let contents = document.getElementsByClassName("tab-content");
+        let btns = document.getElementsByClassName("tab-btn");
+        
+        for (let content of contents) content.classList.remove("active");
+        for (let btn of btns) btn.classList.remove("active");
+        
+        document.getElementById(tabName).classList.add("active");
+        event.currentTarget.classList.add("active");
+    }
+</script>
 
 </body>
 </html>
