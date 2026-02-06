@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Clay County Land Portal | v1.13</title>
+    <title>Clay County Land Portal | v1.14</title>
 
     <script src="https://kfruti88.github.io/Universal-Menu-Bar/universal-menu.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -32,6 +32,7 @@
             width: 100%;
         }
 
+        /* Cinematic Space Background */
         .hero-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle at center, #161b40 0%, #05050a 100%);
@@ -44,14 +45,17 @@
             opacity: 0.3; z-index: -1;
         }
 
+        /* Standard 90% Width Container */
         .wrapper { width: 90%; max-width: 1400px; margin: 60px auto; }
 
+        /* Listing Grid */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
             gap: 30px;
         }
 
+        /* Glossy Tech Card Design */
         .land-card {
             background: var(--card-bg);
             border: 1px solid rgba(0, 242, 255, 0.2);
@@ -62,6 +66,7 @@
             transition: 0.4s;
             backdrop-filter: blur(10px);
             position: relative;
+            height: 100%; /* Ensures cards in the same row align but can grow */
         }
 
         .land-card:hover {
@@ -78,7 +83,12 @@
             background: #111;
         }
 
-        .card-body { padding: 30px; flex-grow: 1; }
+        .card-body { 
+            padding: 30px; 
+            flex-grow: 1; 
+            display: flex; 
+            flex-direction: column; 
+        }
 
         .price-text {
             font-family: 'Orbitron', sans-serif;
@@ -89,7 +99,7 @@
             text-shadow: 0 0 10px var(--thunder-glow);
         }
 
-        /* FIXED: Allowed the name to wrap and show full text */
+        /* FIXED: Full Text Visibility for Property Name */
         .prop-name {
             font-family: 'Orbitron', sans-serif;
             font-size: 1.2rem;
@@ -98,11 +108,14 @@
             letter-spacing: 1px;
             color: #fff;
             line-height: 1.4;
-            word-wrap: break-word; /* Ensures long words don't break the card */
-            overflow: visible;     /* Ensures text isn't cut off */
+            display: block;
+            white-space: normal; /* Allows text to wrap naturally */
+            overflow: visible;     /* Removes any snippet/clipping behavior */
+            word-wrap: break-word; /* Safety for very long technical strings */
+            margin-bottom: 10px;
         }
 
-        .prop-loc { margin: 15px 0 20px 0; }
+        .prop-loc { margin: 5px 0 20px 0; }
 
         .btn-maps {
             color: #aaa;
@@ -122,11 +135,13 @@
             font-size: 1rem;
             line-height: 1.6;
             margin-bottom: 25px;
-            max-height: 150px; /* Increased height slightly for better readability */
+            max-height: 200px; /* Increased slightly for longer descriptions */
             overflow-y: auto;
+            padding-right: 5px;
         }
 
         .btn-source {
+            margin-top: auto; /* Pushes the button to the bottom of the card body */
             display: block;
             text-align: center;
             border: 1px solid var(--electric-blue);
@@ -142,6 +157,7 @@
 
         .btn-source:hover { background: var(--electric-blue); color: var(--deep-space); }
 
+        /* Footer with Yellow Highlighted Date/ID */
         .prop-footer {
             padding: 12px 30px;
             background: rgba(0,0,0,0.6);
@@ -152,6 +168,7 @@
             font-weight: bold;
         }
 
+        /* Responsive Mobile Layout */
         @media (max-width: 768px) {
             .wrapper { width: 95%; }
             .grid { grid-template-columns: 1fr; }
@@ -172,6 +189,7 @@
 </div>
 
 <script>
+    // CSV URL for Land Registry
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT22Warsbi_J0ErAWQsF1WAVXQ9GQZwqWaZG1IDIU9M0ZjR9VniJmFtaPO2dNejCFS5jJO4ca2Jo0Ue/pub?gid=919890739&single=true&output=csv';
 
     async function syncLandData() {
@@ -184,6 +202,7 @@
             container.innerHTML = '';
 
             rows.forEach(row => {
+                // Mapping: A=Name, B=Location/Maps, C=Price, D=Date/ID, E=Source, F=Image, G=Description
                 const cols = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
 
                 if (cols && cols.length >= 7) {
