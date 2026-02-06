@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Clay County Land Portal | v1.12</title>
+    <title>Clay County Land Portal | v1.13</title>
 
     <script src="https://kfruti88.github.io/Universal-Menu-Bar/universal-menu.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -19,7 +19,7 @@
             --deep-space: #05050a;
             --thunder-glow: rgba(0, 242, 255, 0.4);
             --card-bg: rgba(15, 17, 35, 0.95);
-            --highlight-yellow: #ffff00; /* New highlight color */
+            --highlight-yellow: #ffff00;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -32,7 +32,6 @@
             width: 100%;
         }
 
-        /* Cinematic Space Background */
         .hero-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle at center, #161b40 0%, #05050a 100%);
@@ -45,17 +44,14 @@
             opacity: 0.3; z-index: -1;
         }
 
-        /* Standard 90% Width Container */
         .wrapper { width: 90%; max-width: 1400px; margin: 60px auto; }
 
-        /* Listing Grid */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
             gap: 30px;
         }
 
-        /* Glossy Tech Card Design */
         .land-card {
             background: var(--card-bg);
             border: 1px solid rgba(0, 242, 255, 0.2);
@@ -72,15 +68,6 @@
             border-color: var(--electric-blue);
             box-shadow: 0 0 25px var(--thunder-glow);
             transform: translateY(-5px);
-        }
-
-        /* Top Gloss Shine */
-        .land-card::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 50%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, transparent 100%);
-            pointer-events: none;
         }
 
         .prop-img {
@@ -102,6 +89,7 @@
             text-shadow: 0 0 10px var(--thunder-glow);
         }
 
+        /* FIXED: Allowed the name to wrap and show full text */
         .prop-name {
             font-family: 'Orbitron', sans-serif;
             font-size: 1.2rem;
@@ -109,6 +97,9 @@
             margin: 0;
             letter-spacing: 1px;
             color: #fff;
+            line-height: 1.4;
+            word-wrap: break-word; /* Ensures long words don't break the card */
+            overflow: visible;     /* Ensures text isn't cut off */
         }
 
         .prop-loc { margin: 15px 0 20px 0; }
@@ -131,7 +122,7 @@
             font-size: 1rem;
             line-height: 1.6;
             margin-bottom: 25px;
-            max-height: 120px;
+            max-height: 150px; /* Increased height slightly for better readability */
             overflow-y: auto;
         }
 
@@ -151,18 +142,16 @@
 
         .btn-source:hover { background: var(--electric-blue); color: var(--deep-space); }
 
-        /* Updated Footer with Yellow Highlighted Date/ID */
         .prop-footer {
             padding: 12px 30px;
             background: rgba(0,0,0,0.6);
-            font-size: 0.85rem; /* Increased size for visibility */
-            color: var(--highlight-yellow); /* Yellow font */
+            font-size: 0.85rem;
+            color: var(--highlight-yellow);
             text-transform: uppercase;
             border-top: 1px solid rgba(0, 242, 255, 0.1);
             font-weight: bold;
         }
 
-        /* Responsive Mobile Layout */
         @media (max-width: 768px) {
             .wrapper { width: 95%; }
             .grid { grid-template-columns: 1fr; }
