@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Clay County Land Portal | v1.11</title>
+    <title>Clay County Land Portal | v1.12</title>
 
     <script src="https://kfruti88.github.io/Universal-Menu-Bar/universal-menu.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -19,6 +19,7 @@
             --deep-space: #05050a;
             --thunder-glow: rgba(0, 242, 255, 0.4);
             --card-bg: rgba(15, 17, 35, 0.95);
+            --highlight-yellow: #ffff00; /* New highlight color */
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -150,13 +151,15 @@
 
         .btn-source:hover { background: var(--electric-blue); color: var(--deep-space); }
 
+        /* Updated Footer with Yellow Highlighted Date/ID */
         .prop-footer {
             padding: 12px 30px;
             background: rgba(0,0,0,0.6);
-            font-size: 0.75rem;
-            color: #666;
+            font-size: 0.85rem; /* Increased size for visibility */
+            color: var(--highlight-yellow); /* Yellow font */
             text-transform: uppercase;
             border-top: 1px solid rgba(0, 242, 255, 0.1);
+            font-weight: bold;
         }
 
         /* Responsive Mobile Layout */
@@ -180,7 +183,6 @@
 </div>
 
 <script>
-    // Updated CSV URL for Land only
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT22Warsbi_J0ErAWQsF1WAVXQ9GQZwqWaZG1IDIU9M0ZjR9VniJmFtaPO2dNejCFS5jJO4ca2Jo0Ue/pub?gid=919890739&single=true&output=csv';
 
     async function syncLandData() {
@@ -188,13 +190,11 @@
             const response = await fetch(CSV_URL);
             const data = await response.text();
             
-            // Parse rows and remove header
             const rows = data.split('\n').slice(1).filter(row => row.trim() !== '');
             const container = document.getElementById('land-grid');
             container.innerHTML = '';
 
             rows.forEach(row => {
-                // Mapping: A=Name, B=Location/Maps, C=Price, D=Date/ID, E=Source, F=Image, G=Description
                 const cols = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
 
                 if (cols && cols.length >= 7) {
@@ -221,7 +221,7 @@
                                 <a href="${sourceUrl}" class="btn-source" target="_blank">INVESTIGATE SOURCE</a>
                             </div>
                             <div class="prop-footer">
-                                SECTOR ID: ${dateId} | CLAY COUNTY REGISTRY
+                                SECTOR ID / DATE: ${dateId}
                             </div>
                         </div>
                     `;
