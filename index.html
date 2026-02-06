@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Clay County Community Hub | v1.30</title>
+    <title>Clay County Community Hub | v1.33</title>
 
     <script src="https://kfruti88.github.io/Universal-Menu-Bar/universal-menu.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -22,12 +22,34 @@
             --highlight-yellow: #ffff00;
             --maroon-item: #800000;
             --rental-purple: #bc13fe;
+            --amazon-orange: #ff9900;
         }
 
+        /* Hiring Theme Logic */
         .theme-hiring {
             --theme-color: #C41E3A;
             --theme-glow: rgba(196, 30, 58, 0.4);
             animation: bgCycle 15s infinite alternate;
+        }
+
+        /* Hiring-specific: Light Gray Boxes with Solid Black Text */
+        .theme-hiring .item-card {
+            background: rgba(220, 220, 220, 0.95);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+        .theme-hiring .item-name {
+            color: #000000 !important;
+            font-weight: 900;
+        }
+        .theme-hiring .item-desc {
+            color: #000000 !important;
+            font-weight: 600;
+        }
+        .theme-hiring .btn-maps {
+            color: #222 !important;
+        }
+        .theme-hiring .footer-item {
+            color: #C41E3A;
         }
 
         .theme-rentals {
@@ -62,6 +84,17 @@
             letter-spacing: 1px;
         }
         .tab-btn.active { background: var(--theme-color); color: #000; box-shadow: 0 0 15px var(--theme-glow); }
+
+        /* Amazon Specific Tab Styling */
+        #btn-amazon {
+            border-color: var(--amazon-orange);
+            color: var(--amazon-orange);
+        }
+        #btn-amazon:hover {
+            background: var(--amazon-orange);
+            color: #000;
+            box-shadow: 0 0 15px rgba(255, 153, 0, 0.4);
+        }
 
         .rent-highlight {
             color: var(--rental-purple) !important;
@@ -154,6 +187,7 @@
         <button class="tab-btn active" id="btn-land" onclick="switchPortal('land')">Land for Sale</button>
         <button class="tab-btn" id="btn-hiring" onclick="switchPortal('hiring')">Now Hiring</button>
         <button class="tab-btn" id="btn-rentals" onclick="switchPortal('rentals')">For Sale / <span class="rent-highlight">Rent</span></button>
+        <button class="tab-btn" id="btn-amazon" onclick="window.open('https://www.amazon.com/gp/goldbox?tag=werewolf3788-20', '_blank')">Today's Deals</button>
     </div>
 
     <div class="grid" id="main-grid">
@@ -213,7 +247,6 @@
             const rawData = await response.text();
             let dataRows = parseCSV(rawData).slice(1);
             
-            // Priority logic only for Sale/Rentals
             if (type !== 'hiring') {
                 dataRows.sort((a, b) => {
                     const aIsRental = (a[2] || "").toLowerCase().includes("/mo");
@@ -227,18 +260,16 @@
             dataRows.forEach(cols => {
                 let name, maps, val, date, src, img, desc, item;
 
-                // SPECIFIC HIRING MAPPING PER YOUR SCREENSHOT
                 if (type === 'hiring') {
-                    name = cols[0] || 'N/A'; // Col A: Job Name
-                    maps = cols[1] || '#';   // Col B: Map Link
-                    val  = cols[2] || 'N/A'; // Col C: Pay
-                    src  = cols[3] || '#';   // Col D: Source (Apply Link) - NOW ON THE BUTTON
-                    desc = cols[4] || 'No description provided.'; // Col E: Description
-                    item = cols[6] || 'N/A'; // Col G: Item Number
-                    date = '';               // Hiring has no date column
+                    name = cols[0] || 'N/A';
+                    maps = cols[1] || '#';
+                    val  = cols[2] || 'N/A';
+                    src  = cols[3] || '#';
+                    desc = cols[4] || 'No description provided.';
+                    item = cols[6] || 'N/A';
+                    date = '';
                     img  = ''; 
                 } else {
-                    // Standard Land/Rental Mapping
                     name = cols[0] || 'N/A';
                     maps = cols[1] || '#';
                     val  = cols[2] || 'N/A';
