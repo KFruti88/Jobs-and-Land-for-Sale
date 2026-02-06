@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <title>Clay County Community Hub | v1.06</title>
+    <title>Clay County Community Hub | v1.09</title>
 
     <script src="https://kfruti88.github.io/Universal-Menu-Bar/universal-menu.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,14 +16,15 @@
             --electric-blue: #00f2ff;
             --deep-space: #05050a;
             --thunder-glow: rgba(0, 242, 255, 0.4);
-            --card-bg: rgba(15, 17, 35, 0.9);
+            --card-bg: rgba(15, 17, 35, 0.95);
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             background-color: var(--deep-space);
             color: #fff;
             font-family: 'Rajdhani', sans-serif;
-            margin: 0;
             overflow-x: hidden;
             width: 100%;
         }
@@ -34,9 +35,15 @@
             z-index: -1;
         }
 
+        .stars {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/stardust.png');
+            opacity: 0.3; z-index: -1;
+        }
+
         .wrapper { width: 90%; max-width: 1200px; margin: 60px auto; }
 
-        .tab-container { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; }
+        .tab-container { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; flex-wrap: wrap; }
 
         .tab-btn {
             background: var(--card-bg);
@@ -46,6 +53,8 @@
             font-family: 'Orbitron', sans-serif;
             cursor: pointer;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
         }
 
         .tab-btn.active {
@@ -60,7 +69,7 @@
             gap: 30px;
         }
 
-        .land-card {
+        .item-card {
             background: var(--card-bg);
             border: 1px solid rgba(0, 242, 255, 0.2);
             border-radius: 4px;
@@ -71,54 +80,55 @@
             backdrop-filter: blur(10px);
         }
 
-        .land-card:hover {
+        .item-card:hover {
             border-color: var(--electric-blue);
             box-shadow: 0 0 25px var(--thunder-glow);
             transform: translateY(-5px);
         }
 
-        .prop-img {
+        .item-img {
             width: 100%;
             height: 220px;
             object-fit: cover;
             border-bottom: 2px solid var(--electric-blue);
+            background: #111;
         }
 
         .card-body { padding: 25px; flex-grow: 1; }
 
-        .price-text {
+        .badge-text {
             font-family: 'Orbitron', sans-serif;
             color: var(--electric-blue);
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             display: block;
             margin-bottom: 10px;
         }
 
-        .prop-name {
+        .item-name {
             font-family: 'Orbitron', sans-serif;
             font-size: 1.1rem;
             text-transform: uppercase;
             margin: 0;
+            color: #fff;
         }
 
-        .prop-loc { 
+        .item-meta { 
             color: #888; 
             font-size: 0.9rem; 
             margin: 10px 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .prop-loc a {
-            color: var(--electric-blue);
-            text-decoration: none;
-            font-weight: bold;
-        }
+        .item-meta a { color: var(--electric-blue); text-decoration: none; font-weight: bold; }
 
-        .prop-desc {
+        .item-desc {
             color: #d1d1ff;
             font-size: 0.95rem;
             line-height: 1.5;
             margin-bottom: 20px;
-            height: 80px;
+            height: 100px;
             overflow-y: auto;
         }
 
@@ -132,83 +142,104 @@
             font-family: 'Orbitron', sans-serif;
             font-size: 0.8rem;
             transition: 0.3s;
+            font-weight: bold;
         }
 
         .btn-link:hover { background: var(--electric-blue); color: var(--deep-space); }
 
-        .prop-footer {
+        .item-footer {
             padding: 10px 25px;
             background: rgba(0,0,0,0.5);
             font-size: 0.7rem;
             color: #555;
+            text-transform: uppercase;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            .wrapper { width: 95%; }
+            .grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
 <div class="hero-bg"></div>
+<div class="stars"></div>
 
 <div class="wrapper">
     <div class="tab-container">
-        <button class="tab-btn" onclick="location.href='#hiring'">01. Hiring</button>
-        <button class="tab-btn active">02. Land for Sale</button>
-        <button class="tab-btn" onclick="location.href='#housing'">03. Housing</button>
+        <button class="tab-btn active" onclick="switchTab(event, 'hiring', '0')">01. Hiring</button>
+        <button class="tab-btn" onclick="switchTab(event, 'land', '289568772')">02. Land for Sale</button>
+        <button class="tab-btn" onclick="switchTab(event, 'housing', 'YOUR_HOUSING_GID')">03. Housing</button>
     </div>
 
-    <div class="grid" id="land-grid">
-        <p style="text-align:center; color:var(--electric-blue);">Accessing Satellite Data...</p>
-    </div>
+    <div id="hiring" class="tab-content active"><div class="grid" id="hiring-grid"></div></div>
+    <div id="land" class="tab-content"><div class="grid" id="land-grid"></div></div>
+    <div id="housing" class="tab-content"><div class="grid" id="housing-grid"></div></div>
 </div>
 
 <script>
-    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT22Warsbi_J0ErAWQsF1WAVXQ9GQZwqWaZG1IDIU9M0ZjR9VniJmFtaPO2dNejCFS5jJO4ca2Jo0Ue/pub?gid=289568772&output=csv';
+    const BASE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT22Warsbi_J0ErAWQsF1WAVXQ9GQZwqWaZG1IDIU9M0ZjR9VniJmFtaPO2dNejCFS5jJO4ca2Jo0Ue/pub?';
 
-    async function fetchLandData() {
+    async function fetchData(gid, containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '<p style="text-align:center; color:var(--electric-blue);">Syncing Data...</p>';
+        
         try {
-            const response = await fetch(CSV_URL);
+            const response = await fetch(`${BASE_URL}gid=${gid}&output=csv`);
             const data = await response.text();
-            
-            // Clean split that accounts for quoted text in the CSV
             const rows = data.split('\n').slice(1);
-            const container = document.getElementById('land-grid');
             container.innerHTML = '';
 
             rows.forEach(row => {
                 const cols = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-
                 if (cols && cols.length >= 7) {
                     const name = cols[0].replace(/"/g, '');
-                    const mapsLink = cols[1].replace(/"/g, ''); // B: Google Maps URL
-                    const price = cols[2].replace(/"/g, '');
-                    const id = cols[3].replace(/"/g, '');
-                    const source = cols[4].replace(/"/g, '');   // E: Source URL
-                    const image = cols[5].replace(/"/g, '');    // F: Image URL
+                    const mapsLink = cols[1].replace(/"/g, '');
+                    const priceOrPosition = cols[2].replace(/"/g, '');
+                    const dateId = cols[3].replace(/"/g, '');
+                    const source = cols[4].replace(/"/g, '');
+                    const image = cols[5].replace(/"/g, '');
                     const desc = cols[6].replace(/"/g, '');
 
                     container.innerHTML += `
-                        <div class="land-card">
-                            <img src="${image}" class="prop-img" onerror="this.src='https://via.placeholder.com/400x220/05050a/00f2ff?text=Imagery+Unavailable'">
+                        <div class="item-card">
+                            <img src="${image}" class="item-img" onerror="this.src='https://via.placeholder.com/400x220/05050a/00f2ff?text=No+Data+Image'">
                             <div class="card-body">
-                                <span class="price-text">${price}</span>
-                                <h3 class="prop-name">${name}</h3>
-                                <div class="prop-loc">
+                                <span class="badge-text">${priceOrPosition}</span>
+                                <h3 class="item-name">${name}</h3>
+                                <div class="item-meta">
                                     <i class="fas fa-map-marker-alt"></i> 
-                                    <a href="${mapsLink}" target="_blank">View on Google Maps</a>
+                                    <a href="${mapsLink}" target="_blank">LOCATION LINK</a>
                                 </div>
-                                <div class="prop-desc">${desc}</div>
-                                <a href="${source}" class="btn-link" target="_blank">INVESTIGATE SOURCE</a>
+                                <div class="item-desc">${desc}</div>
+                                <a href="${source}" class="btn-link" target="_blank">SOURCE LINK</a>
                             </div>
-                            <div class="prop-footer">ID: ${id} | CLAY COUNTY HUB SYNC</div>
+                            <div class="item-footer">ID: ${dateId} | REGISTRY SYNC</div>
                         </div>
                     `;
                 }
             });
         } catch (err) {
-            console.error(err);
+            container.innerHTML = '<p style="color:red; text-align:center;">Sync Error.</p>';
         }
     }
 
-    window.onload = fetchLandData;
+    function switchTab(evt, tabId, gid) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        evt.currentTarget.classList.add('active');
+        fetchData(gid, `${tabId}-grid`);
+    }
+
+    // Initial load (Page 1)
+    window.onload = () => fetchData('0', 'hiring-grid');
 </script>
 
 </body>
